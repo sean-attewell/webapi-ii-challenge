@@ -59,4 +59,23 @@ routes.delete('/:id', async (req, res) => {
 });
 
 
+routes.put('/:id', async (req, res) => {
+    const { id } = req.params; // rather than write req.params.id each time
+    if (!req.body.title || !req.body.contents) {
+        res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
+    } else {
+    try {
+        const numberUpdated = await Posts.update(id, req.body);
+        if (numberUpdated > 0) {
+            const updatedPost = await Posts.findById(id)
+            res.status(200).json(updatedPost);
+        } else {
+            res.status(404).json({ message: `The post with ID ${id} does not exist.` });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "The post information could not be modified." });
+    }
+}});
+
 module.exports = routes;
